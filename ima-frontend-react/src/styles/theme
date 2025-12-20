@@ -1,0 +1,13 @@
+export const theme = {
+    
+    colors: {
+        primary: "#add8e6", 
+        white: "#fff",
+        light: "#f8f9fa",
+        border: "#dee2e6",
+        background: "#f5f6fa",
+    },
+    spacing: (value) => `${value * 8}px`,
+    radius: "6px"
+
+}

@@ -1,0 +1,15 @@
+import styled from "styled-components";
+
+export const FooterWrapper = styled.footer`
+    width: 100%;
+    height: 55px;
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.black};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+    font-size: 0.95rem;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+
+`;
