@@ -9,12 +9,14 @@ import com.techsolution.ima_backend.repository.ApplicationRepository;
 import com.techsolution.ima_backend.repository.InternshipRepository;
 import com.techsolution.ima_backend.repository.StudentRepository;
 import com.techsolution.ima_backend.services.ApplicationService;
+import com.techsolution.ima_backend.services.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +30,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final StudentRepository studentRepository;
     private final InternshipRepository internshipRepository;
+    private final FileStorageService fileStorageService;
+
 
     // ============================================================
     // 🎓 ÉTUDIANT → postule pour lui-même (JWT)
@@ -35,32 +39,36 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional
     @PreAuthorize("hasAuthority('ROLE_STUDENT')")
-    public ApplicationResponse createApplication(ApplicationRequest applicationRequest) {
+    public ApplicationResponse createApplicationWithCV(ApplicationRequest applicationRequest, MultipartFile cvFile) {
 
-        CustomUserDetails principal =
-                (CustomUserDetails) SecurityContextHolder.getContext()
-                        .getAuthentication()
-                        .getPrincipal();
+        // 1. Identifier l'étudiant via le SecurityContext (JWT)
+        CustomUserDetails principal = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
 
-        Long userId = principal.getUserId();
+        Student student = studentRepository.findByUserId(principal.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Étudiant non trouvé"));
 
-        Student student = studentRepository.findByUserId(userId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Student not found for user id: " + userId
-                        )
-                );
+        // 2. Sauvegarder le fichier PDF physiquement
+        // fileStorageService.save retourne le nom du fichier (ex: UUID_cv.pdf)
+        String fileName = fileStorageService.save(cvFile);
 
-        Application savedApplication = createAndSaveApplication(
-                student,
-                applicationRequest.getInternshipId(),
-                applicationRequest
-        );
+        // 3. Construire l'URL de téléchargement vers votre nouveau FileDownloadController
+        String downloadUrl = "http://localhost:8090/api/v1/files/cv/" + fileName;
 
-        log.info("Student [{}] applied to internship [{}]",
+        // 4. Créer l'entité Application
+        Application application = ApplicationMapper.toEntity(applicationRequest);
+        application.setStudent(student);
+        application.setCvUrl(downloadUrl); // On stocke l'URL générée
+        application.setStatus(ApplicationStatus.PENDING);
+        application.setApplicationDate(LocalDate.now());
+
+        Application savedApplication = applicationRepository.save(application);
+
+        log.info("Candidature créée avec succès pour l'étudiant ID: {} sur le stage ID: {}",
                 student.getId(), applicationRequest.getInternshipId());
 
         return ApplicationMapper.toResponseDto(savedApplication);
+
     }
 
     // ============================================================

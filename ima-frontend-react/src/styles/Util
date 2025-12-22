@@ -20,3 +20,16 @@ export const getRoleColor = (role) => {
         default: return 'bg-secondary';        // Gris
     }
 };
+
+
+export const getStatusBadge = (status) => {
+    switch (status) {
+        case 'VALIDATED': return 'bg-success';
+        case 'PENDING_VALIDATION': return 'bg-warning text-dark';
+        case 'DRAFT': return 'bg-info text-dark';
+        case 'SENT_FOR_SIGNATURE': return 'bg-primary';
+        case 'SIGNED': return 'bg-dark';
+        case 'CANCELED': return 'bg-danger';
+        default: return 'bg-secondary';
+    }
+};

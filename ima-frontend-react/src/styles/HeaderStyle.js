@@ -65,7 +65,13 @@ export const UserInfo = styled.div`
 export const Avatar = styled.div`
     width: 40px;
     height: 40px;
-    background: ${({ theme }) => theme.colors.primary};
+    background-color: #1976d2;
+    color: white;
     border-radius: 50%;
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-left: 15px;
+    border: 2px solid #e3f2fd;
 `;

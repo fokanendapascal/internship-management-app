@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-
 import {
     HeaderContainer,
     LeftBlock,
@@ -11,55 +10,61 @@ import {
 import { searchUser } from '../services/UserService';
 
 const HeaderComponent = () => {
-
     const [searchValue, setSearchValue] = useState("");
 
-    const handleChange = (e) => {
-        setSearchValue(e.target.value);
-    };
+    // Initialisation sécurisée
+    const [user] = useState(() => {
+        try {
+            const savedUser = localStorage.getItem('user');
+            return savedUser ? JSON.parse(savedUser) : null;
+        } catch (error) {
+            console.error("Erreur de lecture du localStorage", error);
+            return null;
+        }
+    });
+
+    const handleChange = (e) => setSearchValue(e.target.value);
 
     const handleSearch = () => {
         if (!searchValue.trim()) return;
-
         searchUser(searchValue)
-            .then(response => {
-                console.log("Résultat :", response.data);
-            })
-            .catch(error => {
-                console.error("Erreur lors de la recherche :", error);
-            });
+            .then(response => console.log("Résultat :", response.data))
+            .catch(error => console.error("Erreur recherche :", error));
+    };
+
+    const getInitials = (user) => {
+        if (user?.firstName) return user.firstName.charAt(0).toUpperCase();
+        if (user?.username) return user.username.charAt(0).toUpperCase();
+        return "?";
     };
 
     return (
         <HeaderContainer>
-
-            {/* Search bar */}
             <LeftBlock>
                 <SearchGroup>
-                <input 
-                    type="text" 
-                    placeholder="Rechercher…" 
-                    className='form-control'
-                    id='searchValue'
-                    name='searchValue'
-                    value={searchValue}
-                    onChange={handleChange}
-                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-
-                />
-                <span onClick={handleSearch} style={{ cursor: 'pointer' }}>
-                    <i className="fa-solid fa-magnifying-glass"></i>
-                </span>
-
+                    <input 
+                        type="text" 
+                        placeholder="Rechercher…" 
+                        className='form-control'
+                        value={searchValue}
+                        onChange={handleChange}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    />
+                    <span onClick={handleSearch} style={{ cursor: 'pointer' }}>
+                        <i className="fa-solid fa-magnifying-glass"></i>
+                    </span>
                 </SearchGroup>
             </LeftBlock>
 
-            {/* Right side */}
             <RightBlock>
-                <UserInfo>Bonjour</UserInfo>
-                <Avatar />
+                <UserInfo>
+                    <span>Bonjour, <strong>{user?.firstName || user?.username || 'Utilisateur'}</strong></span>
+                </UserInfo>
+                {/* L'initiale est calculée dynamiquement */}
+                <Avatar title={user?.firstName || 'User'}>
+                    {getInitials(user)}
+                </Avatar>
             </RightBlock>
-
         </HeaderContainer>
     );
 }

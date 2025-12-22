@@ -129,7 +129,7 @@ const InternshipsPage = () => {
                 {internships.length === 0 && !loading && <p className="text-center">Aucune offre disponible.</p>}
             </div>   
         </div>
-    )
+    );
 }
 
 export default InternshipsPage;

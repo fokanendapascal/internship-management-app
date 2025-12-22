@@ -18,7 +18,6 @@ public class ApplicationSummaryResponse {
     private LocalDate applicationDate;
     private ApplicationStatus status;
 
-    // Inclure un résumé de l'offre ou de l'étudiant pour le contexte
     private InternshipSummaryResponse internship; // Si l'étudiant voit la liste
     private StudentSummaryResponse student;     // Si l'entreprise voit la liste
 }

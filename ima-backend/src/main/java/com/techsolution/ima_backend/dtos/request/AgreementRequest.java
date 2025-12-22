@@ -25,7 +25,7 @@ public class AgreementRequest {
     private String documentPdfUrl;
 
     // L'ID du validateur (enseignant) pourrait être envoyé lors de l'assignation
-    //private Long validatorId;
+    private Long validatorId;
 
     // Statut de la convention : DRAFT, PENDING, VALIDATED, etc.
     private AgreementStatus status;
