@@ -44,7 +44,15 @@ const MenuComponent = () => {
     const navigate = useNavigate();
     const location = useLocation(); // Récupère l'URL actuelle (ex: /students)
 
-    const { unreadCount } = useNotifications();
+    const { counts } = useNotifications();   
+
+    const badgeMapping = {
+        'Messages': counts.messages,
+        'Notifications': counts.notifications,
+        'Candidatures': counts.applications,
+        'Stages': counts.internships,
+        'Conventions': counts.agreements
+    };
 
     // Effet pour ouvrir automatiquement le dossier parent si une sous-page est active
     useEffect(() => {
@@ -73,7 +81,7 @@ const MenuComponent = () => {
             {menuProperties.map(menu => {
                 const hasSubMenu = menu.sousMenu && menu.sousMenu.length > 0;
                 const isOpen = openMenuId === menu.id;
-
+                const badgeValue = badgeMapping[menu.titre];
                 // Vérifier si le menu parent ou un de ses enfants est actif
                 const isActive = location.pathname === menu.url || 
                                  (menu.sousMenu?.some(sm => location.pathname === sm.url));
@@ -92,8 +100,8 @@ const MenuComponent = () => {
                                 <i className={menu.icon || 'fa-solid fa-circle-notch'}></i>
                                 
                                 {/* On affiche le badge si c'est l'item Notifications OU Candidatures */}
-                                {(menu.titre === 'Notifications' || menu.titre === 'Candidatures') && unreadCount > 0 && (
-                                    <Badge>{unreadCount}</Badge> 
+                                {badgeValue > 0 && (
+                                    <Badge>{badgeValue}</Badge> 
                                 )}
                             </div>
 

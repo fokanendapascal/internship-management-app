@@ -32,13 +32,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final InternshipRepository internshipRepository;
     private final FileStorageService fileStorageService;
 
-
     // ============================================================
     // 🎓 ÉTUDIANT → postule pour lui-même (JWT)
     // ============================================================
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     public ApplicationResponse createApplicationWithCV(ApplicationRequest applicationRequest, MultipartFile cvFile) {
 
         // 1. Identifier l'étudiant via le SecurityContext (JWT)
@@ -48,27 +46,33 @@ public class ApplicationServiceImpl implements ApplicationService {
         Student student = studentRepository.findByUserId(principal.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Étudiant non trouvé"));
 
+        // 🚨 AJOUT : Récupérer le stage via l'ID fourni dans la requête
+        Internship internship = internshipRepository.findById(applicationRequest.getInternshipId())
+                .orElseThrow(() -> new ResourceNotFoundException("Stage non trouvé avec l'ID: " + applicationRequest.getInternshipId()));
+
         // 2. Sauvegarder le fichier PDF physiquement
-        // fileStorageService.save retourne le nom du fichier (ex: UUID_cv.pdf)
         String fileName = fileStorageService.save(cvFile);
 
-        // 3. Construire l'URL de téléchargement vers votre nouveau FileDownloadController
+        // 3. Construire l'URL de téléchargement
         String downloadUrl = "http://localhost:8090/api/v1/files/cv/" + fileName;
 
         // 4. Créer l'entité Application
         Application application = ApplicationMapper.toEntity(applicationRequest);
+
+        // 🚨 CRUCIAL : Lier les entités chargées à l'application
         application.setStudent(student);
-        application.setCvUrl(downloadUrl); // On stocke l'URL générée
+        application.setInternship(internship); // <--- C'est cette ligne qui manquait !
+
+        application.setCvUrl(downloadUrl);
         application.setStatus(ApplicationStatus.PENDING);
         application.setApplicationDate(LocalDate.now());
 
         Application savedApplication = applicationRepository.save(application);
 
         log.info("Candidature créée avec succès pour l'étudiant ID: {} sur le stage ID: {}",
-                student.getId(), applicationRequest.getInternshipId());
+                student.getId(), internship.getId());
 
         return ApplicationMapper.toResponseDto(savedApplication);
-
     }
 
     // ============================================================
@@ -76,7 +80,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     // ============================================================
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ApplicationResponse createApplicationForStudent(
             Long studentId,
             ApplicationRequest applicationRequest
@@ -131,7 +134,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     // ============================================================
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_COMPANY')")
     public List<ApplicationResponse> getAllApplications() {
         return applicationRepository.findAll().stream()
                 .map(ApplicationMapper::toResponseDto)
@@ -159,7 +161,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     // ============================================================
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_STUDENT')")
     public ApplicationResponse updateApplication(
             Long applicationId,
             ApplicationRequest applicationRequest
@@ -183,7 +184,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     // ============================================================
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteApplication(Long applicationId) {
 
         Application application = applicationRepository.findById(applicationId)

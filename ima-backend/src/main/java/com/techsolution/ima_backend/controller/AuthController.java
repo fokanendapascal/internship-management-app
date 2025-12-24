@@ -3,6 +3,7 @@ package com.techsolution.ima_backend.controller;
 import com.techsolution.ima_backend.dtos.request.UserLoginRequest;
 import com.techsolution.ima_backend.dtos.request.UserRegisterRequest;
 import com.techsolution.ima_backend.dtos.response.AuthResponse;
+import com.techsolution.ima_backend.entities.User;
 import com.techsolution.ima_backend.services.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -30,4 +31,9 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(userLoginRequest));
     }
 
+    @GetMapping("/authenticated")
+    public ResponseEntity<User> getAuth() {
+        User user = authService.getAuthenticatedUser();
+        return ResponseEntity.ok(user);
+    }
 }

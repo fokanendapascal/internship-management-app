@@ -27,16 +27,18 @@ public class JwtUtil {
     @Value("${security.jwt.refresh-exp-ms:1209600000}") // 14 jours
     private long refreshExpMs;
 
-    private Key getKey() {
+    // Utilisation de SecretKey pour la compatibilité avec les nouvelles versions
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String generateToken(String email, List<String> roles) {
-        return Jwts.builder().subject(email)
+        return Jwts.builder()
+                .subject(email) // Définit le "sub"
                 .claim("roles", roles)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey()) // Signature automatique
                 .compact();
     }
 
@@ -47,30 +49,34 @@ public class JwtUtil {
                 .claim("typ", "refresh")
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(refreshExpMs)))
-                .signWith(getKey())
+                .signWith(getSigningKey())
                 .compact();
     }
 
     public String extractEmail(String token) {
-        return Jwts
-                .parser()
-                .verifyWith((SecretKey) getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+        } catch (Exception e) {
+            // Log important pour voir pourquoi l'extraction échoue
+            return null;
+        }
     }
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts
-                    .parser()
-                    .setSigningKey(getKey())
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
                     .build()
-                    .parseClaimsJws(token);
+                    .parseSignedClaims(token);
             return true;
-        } catch (JwtException e) {
+        } catch (Exception e) {
             return false;
         }
     }
+
 }

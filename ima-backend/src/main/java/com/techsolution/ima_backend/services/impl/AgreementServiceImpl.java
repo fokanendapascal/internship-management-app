@@ -67,7 +67,6 @@ public class AgreementServiceImpl implements AgreementService {
     // ============================================================
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public AgreementResponse createAgreement(Long applicationId, AgreementRequest request) {
 
         Long teacherId = currentUser().getUserId();
@@ -88,7 +87,6 @@ public class AgreementServiceImpl implements AgreementService {
     // POST /api/v1/agreements/admin-create
     // ============================================================
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public AgreementResponse createAgreementByAdmin(
             Long applicationId,
             Long teacherId,
@@ -111,7 +109,6 @@ public class AgreementServiceImpl implements AgreementService {
     // ============================================================
     @Override
     @Transactional
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT', 'ROLE_COMPANY')")
     public AgreementResponse updateAgreement(Long agreementId, AgreementRequest request) {
 
         Agreement agreement = agreementRepository.findById(agreementId)
@@ -166,7 +163,6 @@ public class AgreementServiceImpl implements AgreementService {
     // PUT /api/v1/agreements/{id}/validate
     // ============================================================
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public AgreementResponse validateAgreement(Long agreementId) {
 
         Agreement agreement = agreementRepository.findById(agreementId)
@@ -221,7 +217,6 @@ public class AgreementServiceImpl implements AgreementService {
     // ============================================================
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteAgreement(Long agreementId) {
         Agreement agreement = agreementRepository.findById(agreementId)
                 .orElseThrow(() ->

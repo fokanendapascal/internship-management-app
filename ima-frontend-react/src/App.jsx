@@ -27,6 +27,7 @@ import AgreementsPage from './pages/AgreementsPage';
 import NewAgreementComponent from './components/NewAgreementComponent';
 import { ToastContainer } from 'react-toastify';
 import MessagesPage from './pages/MessagesPage';
+import NewMessageComponent from './components/NewMessageComponent';
 
 function App() {  
     // Initialisation basée sur la présence d'un token
@@ -85,7 +86,8 @@ function App() {
                         {/* Groupes de routes pour la clarté */}
                         <Route path='/messages'> 
                             <Route index element={<MessagesPage/>} />
-
+                            <Route path='new' element={<NewMessageComponent/>} />
+                            <Route path='edit/:id' element={<NewMessageComponent/>} />
                         </Route>
 
                         <Route path='/internships'>

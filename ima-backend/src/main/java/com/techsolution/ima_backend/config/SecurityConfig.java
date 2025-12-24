@@ -26,98 +26,124 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        httpSecurity
+        http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
 
-                        // 🔹 Routes publiques
+                        // 🔹 1. Routes publiques
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/v3/api-docs",
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/register"
-                                ).permitAll()
+                        ).permitAll()
 
-                        // 🔹 2. Exigences spécifiques (RÔLES AJOUTÉS)
+                        // 🔹 2. Agreements (Conventions)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/agreements/**")
+                        .hasAnyAuthority("ROLE_STUDENT", "ROLE_TEACHER", "ROLE_COMPANY", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/agreements/**")
+                        .hasAnyAuthority("ROLE_STUDENT", "ROLE_COMPANY")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/agreements/*/validate")
+                        .hasAuthority("ROLE_TEACHER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/agreements/**")
+                        .hasAnyAuthority("ROLE_TEACHER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/agreements/**")
+                        .hasAuthority("ROLE_ADMIN")
 
-                        // Seules les entreprises (COMPANY) et les administrateurs peuvent créer/modifier des stages
-                        .requestMatchers(HttpMethod.POST, "/api/v1/internships").hasAnyAuthority("ROLE_COMPANY", "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/internships/**").hasAnyAuthority("ROLE_COMPANY", "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/internships/**").hasAnyAuthority("ROLE_COMPANY", "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/internships/**").permitAll()
+                        // 🔹 3. Applications
+                        .requestMatchers(HttpMethod.GET, "/api/v1/applications/**")
+                        .hasAnyAuthority("ROLE_STUDENT", "ROLE_TEACHER", "ROLE_COMPANY", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/applications")
+                        .hasAuthority("ROLE_STUDENT")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/applications/**")
+                        .hasAnyAuthority("ROLE_STUDENT", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/applications/**")
+                        .hasAuthority("ROLE_ADMIN")
 
-                        // Seuls les étudiants (STUDENT) et les admins peuvent créer/modidier les candidatures
-                        .requestMatchers(HttpMethod.POST, "/api/v1/applications").hasAnyAuthority("ROLE_STUDENT")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/applications/for-student/**").hasAnyAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/applications/**").hasAnyAuthority("ROLE_STUDENT", "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/applications/**").hasAnyAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/applications/**").permitAll()
+                        // 🔹 4. Internships
+                        .requestMatchers(HttpMethod.GET, "/api/v1/internships/**")
+                        .hasAnyAuthority("ROLE_STUDENT", "ROLE_TEACHER", "ROLE_COMPANY", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/internships/**")
+                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/internships/**")
+                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/internships/**")
+                        .hasAnyAuthority("ROLE_COMPANY", "ROLE_ADMIN")
 
-                        //Seuls les enseignants (TEACHER) et les admins peuvent créer/modifier les conventions
-                        .requestMatchers(HttpMethod.POST, "/api/v1/agreements").hasAnyAuthority("ROLE_TEACHER")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/agreements/admin-create").hasAnyAuthority( "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/agreements/*/validate").hasAuthority("ROLE_TEACHER")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/agreements/**").hasAnyAuthority("ROLE_TEACHER", "ROLE_ADMIN", "ROLE_STUDENT", "ROLE_COMPANY")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/agreements/**").hasAnyAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/agreements/**").permitAll()
+                        // 🔹 5. Files (upload/download)
+                        .requestMatchers("/api/v1/files/**")
+                        .authenticated()
 
-                        // Seuls les ADMIN peuvent gérer les utilisateurs
-                        .requestMatchers("/api/v1/users/**").hasAuthority("ROLE_ADMIN")
+                        // 🔹 6. Messages & Notifications
+                        .requestMatchers("/api/v1/messages/**", "/api/v1/notifications/**")
+                        .hasAnyAuthority("ROLE_STUDENT", "ROLE_TEACHER", "ROLE_COMPANY", "ROLE_ADMIN")
 
-                        // Les autres routes nécessitent juste l'authentification
-                        .requestMatchers(
-                                "/api/v1/companies/**",
-                                "/api/v1/teachers/**",
-                                "/api/v1/students/**",
-                                "/api/v1/messages/**",
-                                "/api/v1/notifications/**"
-                        ).authenticated()
+                        // 🔹 7. Users, Companies, Students, Teachers
+                        .requestMatchers(HttpMethod.GET, "/api/v1/students/**", "/api/v1/teachers/**")
+                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_TEACHER", "ROLE_STUDENT") // Permettre la lecture
 
+                        .requestMatchers("/api/v1/users/**", "/api/v1/companies/**")
+                        .hasAuthority("ROLE_ADMIN") // Garder la modification/suppression pour l'admin
+
+                        .requestMatchers("/api/v1/users/**").authenticated()
+                        // 🔹 8. Toute autre requête doit être authentifiée
                         .anyRequest().authenticated()
                 )
+
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(
+                                (req, res, exAuth) -> res.sendError(401, "Non autorisé")
+                        )
+                )
+
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(userDetailsService);
 
-        return httpSecurity.build();
+        return http.build();
     }
 
+    // 🔹 CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",   // React
-                "http://localhost:4200"    // Angular (si besoin)
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://localhost:4200"
         ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 
+    // 🔹 Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // 🔹 Authentication Manager
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
         return config.getAuthenticationManager();
     }
 }

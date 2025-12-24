@@ -33,11 +33,16 @@ const NewUserComponent = () => {
                 .then((response) => {
                     const fetchedUser = response.data;
                     // Transformation des rôles : on ne garde que les IDs pour les checkboxes
-                    if (fetchedUser.roles) {
-                        fetchedUser.roles = fetchedUser.roles.map(role => 
-                            typeof role === 'object' ? role.id : role
-                        );
+                    if (Array.isArray(fetchedUser.roles)) {
+                        fetchedUser.roles = fetchedUser.roles.map(role => {
+                            if (typeof role === 'string') return role;
+                            if (typeof role === 'object') {
+                                return role.id || role.name?.replace("ROLE_", "");
+                            }
+                            return null;
+                        }).filter(Boolean);
                     }
+
                     // On garde le mot de passe vide à l'édition pour ne pas écraser l'existant par erreur
                     setNewUser({ ...fetchedUser, password: "" });
                 })
@@ -90,7 +95,10 @@ const NewUserComponent = () => {
         }
     };
 
-
+    const payload = {
+        ...newUser,
+        roles: newUser.roles.map(r => r.toUpperCase())
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -99,12 +107,12 @@ const NewUserComponent = () => {
         try {
             if (id) {
                 // UPDATE
-                await updateUser(id, newUser);
+                await updateUser(id, payload);
                 
                 console.log("Utilisateur mis à jour");
             } else {
                 // CREATE
-                const response = await createUser(newUser);
+                const response = await createUser(payload);
                 const createdUser = response.data;
 
                 redirectAfterCreation(createdUser.id, createdUser.roles);
@@ -219,7 +227,7 @@ const NewUserComponent = () => {
                     <button type="button" onClick={() => navigator('/users')} className="btn btn-outline-secondary">
                         Annuler
                     </button>
-                    <button type="submit" className="btn btn-primary">
+                    <button type="submit" className="btn btn-primary" disabled={loading} >
                         {id ? "Enregistrer les modifications" : "Créer l'utilisateur"}
                     </button>
                 </div>

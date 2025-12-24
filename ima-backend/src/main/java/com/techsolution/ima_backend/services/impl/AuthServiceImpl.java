@@ -12,8 +12,12 @@ import com.techsolution.ima_backend.repository.UserRepository;
 import com.techsolution.ima_backend.security.JwtUtil;
 import com.techsolution.ima_backend.services.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,5 +111,25 @@ public class AuthServiceImpl implements AuthService {
                 refreshToken,
                 UserMapper.toSummaryResponse(newUser)
         );
+    }
+
+    @Override
+    public User getAuthenticatedUser() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                authentication.getPrincipal().equals("anonymousUser")) {
+
+            throw new AccessDeniedException("Utilisateur non authentifié");
+        }
+
+        String email = authentication.getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "Utilisateur non trouvé : " + email
+                ));
     }
 }

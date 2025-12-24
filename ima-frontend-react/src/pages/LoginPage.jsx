@@ -30,6 +30,8 @@ const LoginPage = ({ onLogin }) => { // <--- Ne pas oublier onLogin ici
             const { accessToken, refreshToken, userSummaryResponse } = response.data;
 
             if (accessToken && userSummaryResponse) {
+
+                localStorage.setItem('accessToken', accessToken);
                 // 2. On stocke les données avec les clés exactes du DTO Java
                 const userDetails = {
                     firstName: userSummaryResponse.firstName,

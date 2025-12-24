@@ -32,7 +32,7 @@ const AgreementsPage = () => {
         fetchAgreements();
     }, []); 
 
-    const addNewAgreement = () => navigator('/agreements/new');
+    const addNewAgreement = () => navigator(`/agreements/new`);
     const editAgreement = (id) => navigator(`/agreements/edit/${id}`);
 
     const removeAgreement = async (id) => {

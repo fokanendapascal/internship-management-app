@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { createAgreement } from '../services/AgreementService';
 import { listTeachers } from '../services/TeacherService';
+import { listApplications } from '../services/ApplicationService';
 
 const NewAgreementComponent = () => {
     const navigate = useNavigate();
-    const { applicationId } = useParams(); // Optionnel : si on crée l'accord depuis une candidature spécifique
-
+    
+    // États pour les listes déroulantes
     const [teachers, setTeachers] = useState([]);
+    const [applications, setApplications] = useState([]); // Ajouté
+    
+    // États pour la sélection
+    const [selectedAppId, setSelectedAppId] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [agreement, setAgreement] = useState({
@@ -17,10 +22,12 @@ const NewAgreementComponent = () => {
         validatorId: '',
         documentPdfUrl: ''
     });
-
+    
     useEffect(() => {
-        // Charger la liste des enseignants pour le sélecteur "validatorId"
+        // Charger les enseignants
         listTeachers().then(res => setTeachers(res.data));
+        // Charger les candidatures pour obtenir l'applicationId
+        listApplications().then(res => setApplications(res.data));
     }, []);
 
     const handleChange = (e) => {
@@ -30,11 +37,15 @@ const NewAgreementComponent = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!selectedAppId) {
+            alert("Veuillez sélectionner une candidature.");
+            return;
+        }
+        
         setIsSubmitting(true);
-
         try {
-            // On peut passer l'applicationId via l'URL ou le corps de la requête selon votre API
-            await createAgreement(applicationId, agreement);
+            // On envoie enfin un ID valide au lieu de undefined
+            await createAgreement(selectedAppId, agreement);
             navigate('/agreements');
         } catch (error) {
             console.error("Erreur création convention", error);
@@ -53,6 +64,24 @@ const NewAgreementComponent = () => {
                 <div className="card-body p-4">
                     <form onSubmit={handleSubmit}>
                         <div className="row">
+                            {/* --- AJOUT DU SÉLECTEUR D'APPLICATION (Résout l'erreur 400/401) --- */}
+                            <div className="col-md-12 mb-3">
+                                <label className="form-label fw-bold text-primary">Candidature concernée</label>
+                                <select 
+                                    className="form-select border-primary" 
+                                    value={selectedAppId} 
+                                    onChange={(e) => setSelectedAppId(e.target.value)} 
+                                    required
+                                >
+                                    <option value="">-- Choisir la candidature --</option>
+                                    {applications.map(app => (
+                                        <option key={app.id} value={app.id}>
+                                            ID: {app.id} - {app.internshipTitle} ({app.studentName})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
                             <div className="col-md-6 mb-3">
                                 <label className="form-label fw-bold">Date de début du stage</label>
                                 <input type="date" name="startDate" className="form-control" 
@@ -82,6 +111,11 @@ const NewAgreementComponent = () => {
                                     value={agreement.status} onChange={handleChange}>
                                     <option value="DRAFT">Brouillon (DRAFT)</option>
                                     <option value="PENDING_VALIDATION">En attente de validation</option>
+                                    <option value="VALIDATED">Validée par l'enseignant </option>
+                                    <option value="SENT_FOR_SIGNATURE">Envoyée aux parties pour signature </option>
+                                    <option value="SIGNED">Convention Signée </option>
+                                    <option value="CANCELED">Convention Annulée </option>
+                                    
                                 </select>
                             </div>
                         </div>

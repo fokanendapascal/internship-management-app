@@ -5,6 +5,7 @@ import { listInternships } from '../services/InternshipService';
 import { listStudents } from '../services/StudentService';
 
 const NewApplicationComponent = () => {
+
     const navigator = useNavigate();
     
     const [internships, setInternships] = useState([]);
@@ -25,7 +26,16 @@ const NewApplicationComponent = () => {
     useEffect(() => {
         // Appels API pour remplir les listes (à décommenter selon vos services)
         listInternships().then(res => setInternships(res.data));
-        listStudents().then(res => setStudents(res.data));
+
+        listStudents().then(res => {
+            console.log("Structure des données étudiants :", res.data);
+            // Si c'est un tableau direct :
+            setStudents(res.data);
+            // Si c'est paginé (Spring Data JPA) :
+            // setStudents(res.data.content || res.data);
+        }
+           
+        );
     }, []);
 
     const handleChange = (e) => {
@@ -49,23 +59,26 @@ const NewApplicationComponent = () => {
         setIsSubmitting(true);
 
         try {
-            // On prépare l'objet JSON attendu par le Backend (ApplicationRequest)
+            // 1. On récupère l'ID du stage depuis l'état du formulaire
+            const idFromForm = newApplication.internshipId; 
+
+            // 2. On prépare l'objet JSON
             const applicationRequest = {
                 applicationDate: newApplication.applicationDate,
                 status: newApplication.status,
                 coverLetter: newApplication.coverLetter,
-                internshipId: newApplication.internshipId,
+                internshipId: idFromForm, // On s'assure qu'il est ici
                 studentId: newApplication.studentId
             };
 
-            // Appel au service corrigé (celui qui utilise FormData)
-            await createApplication(applicationRequest, cvFile);
+            // 3. Appel au service : On passe idFromForm comme premier argument
+            await createApplication(idFromForm, applicationRequest, cvFile);
             
             navigator('/applications');
         } catch (error) {
-            console.error(error);
+            console.error("Erreur détaillée:", error.response?.data || error.message);
             alert("Erreur lors de la création de la candidature.");
-        }finally{
+        } finally {
             setIsSubmitting(false);
         }
     };

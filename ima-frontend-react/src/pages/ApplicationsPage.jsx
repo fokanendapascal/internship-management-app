@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import { deleteApplication, listApplications } from '../services/ApplicationService';
 
 const ApplicationsPage = () => {
@@ -7,7 +7,6 @@ const ApplicationsPage = () => {
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState(null);
-
     const [searchTerm, setSearchTerm] = useState("");
 
     const navigator = useNavigate();

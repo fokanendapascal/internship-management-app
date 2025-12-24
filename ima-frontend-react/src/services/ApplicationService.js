@@ -16,19 +16,26 @@ export const updateApplication = (applicationId, applicationRequest) =>
 export const deleteApplication = (applicationId) => 
     securedAxiosInstance.delete(`${REST_API_APPLICATIONS}/${applicationId}`);
 
-export const createApplication = (applicationRequest, cvFile) => {
+export const createApplication = (internshipId, applicationRequest, cvFile) => {
     const formData = new FormData();
 
     // 1. On ajoute le fichier binaire
-    // Le nom 'cvFile' doit correspondre exactement au @RequestPart du Backend
     formData.append('cvFile', cvFile);
 
-    // 2. On ajoute les données JSON
-    // On les transforme en Blob avec le type application/json pour que Spring les reconnaisse
-    const blob = new Blob([JSON.stringify(applicationRequest)], {
+    // 2. On injecte l'internshipId dans l'objet de requête avant de le sérialiser
+    const updatedRequest = {
+        ...applicationRequest,
+        internshipId: internshipId // S'assure que l'ID est présent dans le JSON
+    };
+
+    // 3. On ajoute les données JSON avec l'ID inclus
+    const blob = new Blob([JSON.stringify(updatedRequest)], {
         type: 'application/json'
     });
     formData.append('application', blob);
+
+    // Facultatif : Si votre backend attend l'ID en paramètre d'URL plutôt que dans le JSON
+    // changez l'URL en : `${REST_API_APPLICATIONS}/with-cv?internshipId=${internshipId}`
 
     return securedAxiosInstance.post(`${REST_API_APPLICATIONS}/with-cv`, formData, {
         headers: {
@@ -36,3 +43,4 @@ export const createApplication = (applicationRequest, cvFile) => {
         }
     });
 };
+

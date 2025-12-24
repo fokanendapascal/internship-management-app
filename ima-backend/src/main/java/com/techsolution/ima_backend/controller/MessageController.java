@@ -5,11 +5,13 @@ import com.techsolution.ima_backend.dtos.response.MessageResponse;
 import com.techsolution.ima_backend.services.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin("*")
 @AllArgsConstructor
@@ -36,8 +38,12 @@ public class MessageController {
 
     //Build get all messages REST API
     @GetMapping
-    public ResponseEntity<List<MessageResponse>> getAllMessages() {
-        List<MessageResponse> messages = messageService.getAllMessages();
+    public ResponseEntity<Page<MessageResponse>> getAllMessages(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<MessageResponse> messages = messageService.getAllMessages(pageable);
         return ResponseEntity.ok(messages);
     }
 

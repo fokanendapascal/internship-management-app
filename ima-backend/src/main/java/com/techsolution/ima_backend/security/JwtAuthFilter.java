@@ -30,22 +30,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // 🔥 1. Exclure Swagger et API Docs du filtre JWT
-        if (path.startsWith("/swagger-ui")
-                || path.equals("/swagger-ui.html")
-                || path.startsWith("/v3/api-docs")) {
-
+        // 🔹 Exclure Swagger, API docs et endpoints d’auth
+        if (path.startsWith("/swagger-ui") || path.equals("/swagger-ui.html")
+                || path.startsWith("/v3/api-docs") || path.startsWith("/api/v1/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 🔥 2. Exclure les endpoints d'authentification
-        if (path.startsWith("/api/v1/auth/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 🔥 3. Exclure les requêtes OPTIONS (préflight CORS)
+        // 🔹 Exclure OPTIONS (préflight CORS)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
@@ -54,15 +46,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // ---------------------------------------
         // 🔐 4. Traitement normal du JWT
         // ---------------------------------------
-
-        String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
         String token = null;
         String email = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            email = jwtUtil.extractEmail(token);
+            // Ajoutez ceci pour voir le coupable :
+            log.info("TOKEN BRUT RECU: [{}]", token);
+            try {
+                email = jwtUtil.extractEmail(token);
+                log.info("EMAIL EXTRAIT: {}", email);
+            } catch (Exception e) {
+                log.warn("Erreur extraction email depuis JWT: {}", e.getMessage());
+                log.error("ERREUR D'EXTRACTION: {}", e.getMessage());
+            }
         }
+
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(email);

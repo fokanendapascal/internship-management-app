@@ -28,7 +28,6 @@ public class AgreementController {
 
     //Build add agreement REST API (Teacher)
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_TEACHER')")
     public ResponseEntity<AgreementResponse>  createAgreement(@RequestParam Long applicationId,
                                                               @Valid @RequestBody AgreementRequest agreementRequest) {
 
@@ -41,7 +40,6 @@ public class AgreementController {
 
     //Build add agreement REST API (Admin)
     @PostMapping("/admin-create")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<AgreementResponse> createAgreementForAdmin(@RequestParam Long applicationId,
                                                                      @RequestParam Long teacherId,
                                                                      @Valid @RequestBody AgreementRequest agreementRequest) {
