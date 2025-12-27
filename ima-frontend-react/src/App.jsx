@@ -28,6 +28,7 @@ import NewAgreementComponent from './components/NewAgreementComponent';
 import { ToastContainer } from 'react-toastify';
 import MessagesPage from './pages/MessagesPage';
 import NewMessageComponent from './components/NewMessageComponent';
+import OverviewPage from './pages/OverviewPage';
 
 function App() {  
     // Initialisation basée sur la présence d'un token
@@ -80,8 +81,10 @@ function App() {
                         
                         {/* Redirection automatique de "/" vers le dashboard */}
                         <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+                        <Route path='/dashboard' element={<OverviewPage/>} />
                         
-                        <Route path="/dashboard" element={<StatistiquesPage />} />
+                        <Route path="/stats" element={<StatistiquesPage />} />
 
                         {/* Groupes de routes pour la clarté */}
                         <Route path='/messages'> 

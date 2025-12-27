@@ -19,7 +19,7 @@ const menuProperties = [
         icon: 'fa-solid fa-chart-line',
         sousMenu: [
             { id: '11', titre: "Vue d'ensemble", icon: 'fa-solid fa-chart-pie', url: '/dashboard' },
-            { id: '12', titre: 'Statistiques', icon: 'fa-solid fa-chart-column', url: '/dashboard' }
+            { id: '12', titre: 'Statistiques', icon: 'fa-solid fa-chart-column', url: '/stats' }
         ],
     },
     {
