@@ -31,7 +31,7 @@ import {
     Legend
 } from 'recharts';
 
-import { getStatusBadge } from '../styles/Util';
+import { getStatusBadge } from '../styles/Util.js';
 
 /* ================= STYLES ================= */
 
