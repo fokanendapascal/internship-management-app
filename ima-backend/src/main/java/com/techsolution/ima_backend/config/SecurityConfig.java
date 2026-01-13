@@ -86,8 +86,11 @@ public class SecurityConfig {
                         .hasAnyAuthority("ROLE_COMPANY", "ROLE_ADMIN")
 
                         // 🔹 5. Files (upload/download)
-                        .requestMatchers("/api/v1/files/**")
-                        .authenticated()
+                        .requestMatchers(
+                                "/api/v1/files/**",
+                                "/api/v1/auth/authenticated",
+                                "/api/v1/auth/refresh-token"
+                        ).authenticated()
 
                         // 🔹 6. Messages & Notifications
                         .requestMatchers("/api/v1/messages/**", "/api/v1/notifications/**")
@@ -121,12 +124,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:4200"
-        ));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+        config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

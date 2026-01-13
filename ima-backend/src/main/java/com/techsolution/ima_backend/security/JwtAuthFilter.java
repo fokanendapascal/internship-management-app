@@ -30,9 +30,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // 🔹 Exclure Swagger, API docs et endpoints d’auth
-        if (path.startsWith("/swagger-ui") || path.equals("/swagger-ui.html")
-                || path.startsWith("/v3/api-docs") || path.startsWith("/api/v1/auth/")) {
+        System.out.println(">>> JWT FILTER CALLED");
+        System.out.println("HEADER = " + request.getHeader("Authorization"));
+
+        // 🔹 Exclure Swagger et les endpoints d'auth PUBLICS uniquement
+        if (path.startsWith("/swagger-ui") ||
+                path.equals("/swagger-ui.html") ||
+                path.startsWith("/v3/api-docs") ||
+                path.equals("/api/v1/auth/login") ||
+                path.equals("/api/v1/auth/register")) {
+
             filterChain.doFilter(request, response);
             return;
         }
@@ -61,6 +68,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 log.warn("Erreur extraction email depuis JWT: {}", e.getMessage());
                 log.error("ERREUR D'EXTRACTION: {}", e.getMessage());
             }
+        }else {
+            log.debug("Pas de token Bearer dans l’en-tête pour : {}", path);
         }
 
 

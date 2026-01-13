@@ -34,7 +34,7 @@ public class MessageServiceImpl implements MessageService {
     public MessageResponse createMessage(MessageRequest messageRequest) {
 
         // 1️⃣ Expéditeur (depuis le JWT)
-        User sender = authService.getAuthenticatedUser();
+        User sender = authService.getAuthenticatedUserEntity();
 
         // 2️⃣ Destinataire (depuis l’ID)
         User recipient = userRepository.findById(messageRequest.getRecipientId())
@@ -92,7 +92,7 @@ public class MessageServiceImpl implements MessageService {
                 );
 
         // 🔐 Sécurité : seul l'expéditeur peut modifier son message
-        User currentUser = authService.getAuthenticatedUser();
+        User currentUser = authService.getAuthenticatedUserEntity();
         if (!message.getSender().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Vous ne pouvez pas modifier ce message");
         }
@@ -119,7 +119,7 @@ public class MessageServiceImpl implements MessageService {
                 new ResourceNotFoundException("Message is not exist with given id : " + messageId));
 
         // 2️⃣ Vérification sécurité : seul l'expéditeur peut supprimer
-        User currentUser = authService.getAuthenticatedUser();
+        User currentUser = authService.getAuthenticatedUserEntity();
         if (!message.getSender().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Vous ne pouvez pas supprimer ce message");
         }

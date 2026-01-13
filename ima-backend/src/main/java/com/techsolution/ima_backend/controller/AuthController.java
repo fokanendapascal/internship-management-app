@@ -3,7 +3,7 @@ package com.techsolution.ima_backend.controller;
 import com.techsolution.ima_backend.dtos.request.UserLoginRequest;
 import com.techsolution.ima_backend.dtos.request.UserRegisterRequest;
 import com.techsolution.ima_backend.dtos.response.AuthResponse;
-import com.techsolution.ima_backend.entities.User;
+import com.techsolution.ima_backend.dtos.response.UserResponse;
 import com.techsolution.ima_backend.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -57,6 +57,7 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody UserLoginRequest userLoginRequest) {
+        System.out.println("Tentative de connexion pour : " + userLoginRequest.getEmail());
         return ResponseEntity.ok(authService.login(userLoginRequest));
     }
 
@@ -70,8 +71,21 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Erreur interne du serveur lors de la récupération du profil")
     })
     @GetMapping("/authenticated")
-    public ResponseEntity<User> getAuth() {
-        User user = authService.getAuthenticatedUser();
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserResponse> getAuth() {
+        System.out.println(">>> AUTH CONTROLLER CALLED");
+        return ResponseEntity.ok(authService.getAuthenticatedUserResponse());
     }
+
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        String refreshToken = authHeader.substring(7);
+        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+    }
+
 }
