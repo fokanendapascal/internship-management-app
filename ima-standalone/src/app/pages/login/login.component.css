@@ -1,0 +1,20 @@
+.login-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.btn-primary {
+    padding: 10px;
+    font-weight: 600;
+    background-color: #0062cc; /* Couleur personnalisée si besoin */
+}
+
+input.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 98, 204, 0.25);
+    border-color: #0062cc;
+}

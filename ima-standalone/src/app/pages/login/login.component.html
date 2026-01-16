@@ -1,0 +1,55 @@
+<div class="login-container d-flex align-items-center justify-content-center">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
+
+        <div class="text-center mb-4">
+            <h3>Connexion</h3>
+            <p class="text-muted">Gestion des Stages</p>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger py-2 small" role="alert">
+            {{ errorMessage }}
+        </div>
+
+        <div *ngIf="sessionExpiredMessage" class="alert alert-warning">
+            Votre session a expiré. Veuillez vous reconnecter.
+        </div>
+
+        <form (ngSubmit)="login()" #loginForm="ngForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-control"
+                [(ngModel)]="userLoginRequest.email"
+                required
+                #emailInput="ngModel"
+                placeholder="nom@exemple.com">
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                [(ngModel)]="userLoginRequest.password"
+                required
+                placeholder="••••••••">
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+                [disabled]="isLoading || loginForm.invalid">
+
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                {{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}
+            </button>
+        </form>
+
+    </div>
+</div>
+

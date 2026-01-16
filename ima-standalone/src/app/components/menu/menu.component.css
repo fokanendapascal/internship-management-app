@@ -1,0 +1,16 @@
+/* Supprime la flèche Bootstrap pour les menus simples */
+.accordion-button.no-arrow::after {
+    display: none;
+}
+
+/* Effet au survol des sous-menus */
+.list-group-item-action:hover {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+}
+
+/* Alignement des icônes */
+.accordion-button i {
+    width: 20px;
+    text-align: center;
+}

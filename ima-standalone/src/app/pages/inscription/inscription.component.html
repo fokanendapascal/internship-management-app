@@ -1,0 +1,67 @@
+<div class="register-container d-flex align-items-center justify-content-center">
+    <div class="card shadow-lg p-4 my-5" style="width: 100%; max-width: 600px;">
+
+        <div class="text-center mb-4">
+        <h3 class="fw-bold">Créer un compte</h3>
+        <p class="text-muted">Rejoignez la plateforme de gestion des stages</p>
+        </div>
+
+        <div *ngIf="errorsMsg.length > 0" class="alert alert-danger p-2 small">
+        <ul class="mb-0">
+            <li *ngFor="let msg of errorsMsg">{{ msg }}</li>
+        </ul>
+        </div>
+
+        <form (ngSubmit)="register()" #registerForm="ngForm">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                <label class="form-label">Prénom</label>
+                <input type="text" name="firstName" class="form-control" [(ngModel)]="userRegisterRequest.firstName" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                <label class="form-label">Nom</label>
+                <input type="text" name="lastName" class="form-control" [(ngModel)]="userRegisterRequest.lastName" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" [(ngModel)]="userRegisterRequest.email" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                <label class="form-label">Téléphone</label>
+                <input type="tel" name="telephone" class="form-control" [(ngModel)]="userRegisterRequest.telephone">
+                </div>
+            </div>
+
+
+
+            <div class="mb-3">
+                <label class="form-label">Je suis un(e)...</label>
+                <select name="role" class="form-select" [(ngModel)]="userRegisterRequest.roles[0]" required>
+                <option value="" disabled selected>Choisissez votre profil</option>
+                <option value="STUDENT">Étudiant</option>
+                <option value="TEACHER">Enseignant</option>
+                <option value="COMPANY">Entreprise</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" name="password" class="form-control" [(ngModel)]="userRegisterRequest.password" required minlength="6">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3" [disabled]="isLoading || registerForm.invalid">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                S'inscrire
+            </button>
+
+            <div class="text-center">
+                <span class="text-muted small">Déjà un compte ? </span>
+                <a href="javascript:void(0)" (click)="login()" class="small text-decoration-none fw-bold">Se connecter</a>
+            </div>
+        </form>
+    </div>
+</div>
+

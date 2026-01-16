@@ -1,0 +1,49 @@
+<div class="accordion" id="accordionMenu">
+    <div class="card border-0" *ngFor="let item of menuProperties">
+
+        <ng-container *ngIf="item.sousMenu && item.sousMenu.length > 0; else simpleMenu">
+            <h2 class="card-header p-0" [id]="'heading-' + item.id">
+                <button
+                    class="accordion-button"
+                    [class.collapsed]="!item.ouvert"
+                    [class.no-arrow]="!item.sousMenu"
+                    type="button"
+                    (click)="navigate(item)">
+                    <i [class]="item.icon + ' me-2'"></i>
+                    {{ item.titre }}
+                </button>
+            </h2>
+
+            <div
+                class="accordion-collapse collapse"
+                [class.show]="item.ouvert"
+                *ngIf="item.sousMenu">
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li
+                            *ngFor="let sub of item.sousMenu"
+                            class="list-group-item list-group-item-action ps-4"
+                            (click)="navigate(sub)">
+                            <i [class]="sub.icon + ' me-2'"></i>
+                            {{ sub.titre }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-template #simpleMenu>
+            <h2 class="card-header p-0">
+                <button
+                class="accordion-button no-arrow"
+                type="button"
+                (click)="navigate(item)">
+                <i [class]="item.icon + ' me-2'"></i>
+                {{ item.titre }}
+                </button>
+            </h2>
+        </ng-template>
+
+    </div>
+</div>
+
