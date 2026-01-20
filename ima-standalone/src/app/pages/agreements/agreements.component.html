@@ -1,1 +1,96 @@
-<p>agreements.component works!</p>
+<div class="container my-5">
+    <h2 class="text-center mb-4">Liste des Conventions</h2>
+
+    <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-primary" (click)="addNewAgreement()">
+            <i class="fa fa-plus"></i> Ajouter une convention
+        </button>
+        <button class="btn btn-outline-secondary" (click)="fetchAgreements()" [disabled]="loading">
+            <i class="fa fa-refresh" [class.fa-spin]="loading"></i> Actualiser
+        </button>
+    </div>
+
+    <div *ngIf="errors" class="alert alert-danger">{{ errors }}</div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="fa fa-filter"></i></span>
+                <select class="form-select" [(ngModel)]="statusFilter">
+                    <option value="ALL">Tous les statuts</option>
+                    <option value="DRAFT">Brouillon (DRAFT)</option>
+                    <option value="PENDING_VALIDATION">En attente de validation</option>
+                    <option value="VALIDATED">Validée</option>
+                    <option value="SENT_FOR_SIGNATURE">En cours de signature</option>
+                    <option value="SIGNED">Signée (SIGNED)</option>
+                    <option value="CANCELED">Annulée</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="loading && agreements.length === 0" class="text-center my-5">
+        <div class="spinner-border text-primary"></div>
+        <p>Chargement...</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="agreements.length > 0">
+        <table class="table table-striped table-hover shadow-sm align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Dates (Début/Fin)</th>
+                    <th>Statut</th>
+                    <th>Document</th>
+                    <th>Candidature / Stage</th>
+                    <th>Validateur</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let agreement of filteredAgreements">
+                    <td>
+                        <div class="small">Du: {{ agreement.startDate | date:'dd/MM/yyyy' }}</div>
+                        <div class="small">Au: {{ agreement.endDate | date:'dd/MM/yyyy' }}</div>
+                    </td>
+                    <td>
+                        <span class="badge" [ngClass]="styleService.getStatusBadge(agreement.status)">
+                        {{ agreement.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a *ngIf="agreement.documentPdfUrl; else noDoc"
+                        [href]="agreement.documentPdfUrl"
+                        target="_blank"
+                        class="btn btn-sm btn-link text-danger">
+                            <i class="fa fa-file-pdf-o"></i> PDF
+                        </a>
+                        <ng-template #noDoc>Pas de doc</ng-template>
+                    </td>
+                    <td>
+                        {{ agreement.application?.internship?.title || "N/A" }}
+                    </td>
+                    <td>
+                        {{ agreement.validator ? (agreement.validator.firstName + ' ' + agreement.validator.lastName) : "En attente" }}
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-warning" (click)="editAgreement(agreement.id)">
+                                Modifier
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    (click)="removeAgreement(agreement.id)"
+                                    [disabled]="loading">
+                                Supprimer
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p *ngIf="agreements.length === 0 && !loading" class="text-center mt-4">
+        Aucune convention disponible.
+    </p>
+</div>
+

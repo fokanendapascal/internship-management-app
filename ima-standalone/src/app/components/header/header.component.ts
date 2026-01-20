@@ -3,12 +3,14 @@ import { Observable } from 'rxjs';
 import { UserResponse } from '../../core/api/models';
 import { AuthService } from '../../services/auth/auth-service';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-header',
     imports: [
         CommonModule,
-        
+        FormsModule,
+
     ],
     templateUrl: './header.component.html',
     styleUrl: './header.component.css',

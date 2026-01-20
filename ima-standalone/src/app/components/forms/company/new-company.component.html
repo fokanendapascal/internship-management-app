@@ -1,0 +1,81 @@
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2 class="mb-0">
+                        {{ id ? "Modifier l'entreprise" : "Nouvelle Entreprise" }}
+                    </h2>
+                </div>
+
+                <div *ngIf="userId && !id" class="alert alert-info m-3 mb-0">
+                    Création d'un profil entreprise pour l'utilisateur ID : <strong>{{ userId }}</strong>
+                </div>
+
+                <div *ngIf="loading && id" class="text-center my-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Chargement des données...</p>
+                </div>
+
+                <div class="card-body p-4" *ngIf="!(loading && id)">
+                    <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nom de l'entreprise</label>
+                            <input type="text" class="form-control" formControlName="name"
+                                [class.is-invalid]="companyForm.get('name')?.touched && companyForm.get('name')?.invalid">
+                            <div class="invalid-feedback">Le nom est obligatoire</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Adresse</label>
+                            <input type="text" class="form-control" formControlName="address"
+                                [class.is-invalid]="companyForm.get('address')?.touched && companyForm.get('address')?.invalid">
+                            <div class="invalid-feedback">L'adresse est obligatoire</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea class="form-control" formControlName="description" rows="3"
+                                [class.is-invalid]="companyForm.get('description')?.touched && companyForm.get('description')?.invalid"></textarea>
+                            <div class="invalid-feedback">La description est obligatoire</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Site Web</label>
+                                <input type="text" class="form-control" formControlName="website" placeholder="https://..."
+                                [class.is-invalid]="companyForm.get('website')?.touched && companyForm.get('website')?.invalid">
+                                <div class="invalid-feedback">L'URL doit être valide (ex: https://...)</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Téléphone</label>
+                                <input type="tel" class="form-control" formControlName="phone"
+                                [class.is-invalid]="companyForm.get('phone')?.touched && companyForm.get('phone')?.invalid">
+                                <div class="invalid-feedback">Le numéro est obligatoire</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Email Professionnel</label>
+                            <input type="email" class="form-control" formControlName="professionalEmail"
+                                [class.is-invalid]="companyForm.get('professionalEmail')?.touched && companyForm.get('professionalEmail')?.invalid">
+                            <div class="invalid-feedback">Veuillez entrer un email professionnel valide</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light border" (click)="router.navigate(['/companies'])">
+                                Annuler
+                            </button>
+                            <button type="submit" class="btn btn-success" [disabled]="loading">
+                                <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+                                {{ loading ? "En cours..." : (id ? "Mettre à jour" : "Créer l'entreprise") }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

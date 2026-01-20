@@ -1,1 +1,73 @@
-<p>statistiques.component works!</p>
+<div class="page-container p-4 bg-light min-vh-100">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold m-0 text-dark">IMA Analytics</h2>
+                <p class="text-muted m-0">Suivi en temps réel des conventions</p>
+            </div>
+            <button class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
+                <lucide-icon name="download" size="16"></lucide-icon> Export PDF
+            </button>
+        </div>
+
+        <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+        </div>
+
+        <div *ngIf="!loading && !error">
+        <div class="row mb-4">
+            <div class="col-md-3" *ngFor="let kpi of [
+            {l: 'Conventions', v: stats.totalAgreements, i: 'file-check'},
+            {l: 'Candidatures', v: stats.totalApplications, i: 'building-2'},
+            {l: 'Étudiants', v: stats.totalStudents, i: 'users'},
+            {l: 'Taux Validé', v: stats.validationRate + '%', i: 'shield-check'}
+            ]">
+                <div class="card border-0 shadow-sm p-3 mb-3 h-100">
+                    <div class="d-flex justify-content-between">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">{{kpi.l}}</small>
+                        <h3 class="fw-bold m-0">{{kpi.v}}</h3>
+                    </div>
+                    <div class="p-2 bg-light rounded text-primary">
+                        <lucide-icon [name]="kpi.i"></lucide-icon>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm p-4 h-100">
+                    <h6 class="fw-bold mb-4">Volume des candidatures par mois</h6>
+                    <div style="height: 300px;">
+                        <ngx-charts-bar-vertical
+                            [results]="barChartData"
+                            [scheme]="customScheme"
+                            [xAxis]="true"
+                            [yAxis]="true"
+                            [showDataLabel]="true">
+                        </ngx-charts-bar-vertical>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm p-4 h-100">
+                    <h6 class="fw-bold mb-4">Répartition par statut</h6>
+                    <div style="height: 300px;">
+                        <ngx-charts-pie-chart
+                            [results]="pieChartData"
+                            [scheme]="statusScheme"
+                            [doughnut]="true"
+                            [legend]="true"
+                            [legendPosition]="positionBelow">
+                        </ngx-charts-pie-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+

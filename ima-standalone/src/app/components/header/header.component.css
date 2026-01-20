@@ -1,20 +1,52 @@
+/* Force le composant Angular à prendre toute la largeur */
+:host {
+    display: block;
+    width: 100%;
+}
+
+.header-container {
+    width: 100%;
+    background-color: #defdef;
+    border-bottom: 1px solid #e9ecef;
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between; /* Espace entre titre à gauche et profil à droite */
+    align-items: center;
+    max-width: 100%;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto; /* Pousse le profil vers la droite */
+}
+
+.user-greeting {
+    font-size: 0.9rem;
+    color: #495057;
+}
+
 .avatar {
     width: 40px;
     height: 40px;
-    background-color: #007bff; /* Bleu primaire ou couleur dynamique */
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
     color: white;
-    border-radius: 50%; /* Cercle parfait */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 0.9rem;
-    border: 2px solid #e0e0e0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: transform 0.2s;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 5px rgba(13, 110, 253, 0.3);
+    transition: all 0.2s ease;
 }
 
 .avatar:hover {
-    transform: scale(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.4);
 }

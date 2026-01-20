@@ -1,0 +1,45 @@
+<div class="container my-4">
+    <h2 class="text-center mb-4">
+        {{ id ? "Modifier l'étudiant" : "Créer un nouvel étudiant" }}
+    </h2>
+
+    <div *ngIf="userId && !id" class="alert alert-info shadow-sm">
+        Création d'un profil étudiant pour l'utilisateur ID : <strong>{{ userId }}</strong>
+    </div>
+
+    <div *ngIf="loading && id" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2">Chargement....</p>
+    </div>
+
+    <form *ngIf="!(loading && id)"
+        [formGroup]="studentForm" (ngSubmit)="onSubmit()" class="border p-4 rounded shadow-sm bg-light"
+        >
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Code Étudiant</label>
+                <input type="text" class="form-control" formControlName="studentCode"
+                    [class.is-invalid]="studentForm.get('studentCode')?.touched && studentForm.get('studentCode')?.invalid">
+                <div class="invalid-feedback">Le matricule est obligatoire</div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Niveau (Level)</label>
+                <input type="text" class="form-control" formControlName="level"
+                    [class.is-invalid]="studentForm.get('level')?.touched && studentForm.get('level')?.invalid">
+                <div class="invalid-feedback">Le niveau d'étude est obligatoire</div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" (click)="router.navigate(['/students'])" class="btn btn-outline-secondary">
+                Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="loading">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+                {{ loading ? "En cours..." : (id ? "Enregistrer" : "Créer") }}
+            </button>
+        </div>
+    </form>
+</div>
+

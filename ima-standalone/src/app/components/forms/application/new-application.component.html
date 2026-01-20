@@ -1,0 +1,68 @@
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">Nouvelle Candidature</h3>
+        </div>
+        <div class="card-body p-4">
+            <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()">
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Étudiant</label>
+                        <select formControlName="studentId" class="form-select"
+                                [class.is-invalid]="applicationForm.get('studentId')?.touched && applicationForm.get('studentId')?.invalid">
+                        <option value="">Choisir un étudiant...</option>
+                        <option *ngFor="let st of students" [value]="st.id">
+                            {{ st.lastName }} {{ st.firstName }}
+                        </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Offre de Stage</label>
+                        <select formControlName="internshipId" class="form-select"
+                                [class.is-invalid]="applicationForm.get('internshipId')?.touched && applicationForm.get('internshipId')?.invalid">
+                        <option value="">Choisir un stage...</option>
+                        <option *ngFor="let i of internships" [value]="i.id">
+                            {{ i.title }}
+                        </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Document CV (PDF)</label>
+                        <input type="file" class="form-control" accept=".pdf"
+                            (change)="onFileChange($event)" required>
+                        <div *ngIf="applicationForm.touched && ! cvFile" class="text-danger small mt-1">
+                        Le fichier PDF est requis.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Date de candidature</label>
+                        <input type="date" formControlName="applicationDate" class="form-control"
+                            [class.is-invalid]="applicationForm.get('applicationDate')?.touched && applicationForm.get('applicationDate')?.invalid">
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">Lettre de motivation</label>
+                        <textarea formControlName="coverLetter" class="form-control" rows="5"
+                                placeholder="Décrivez votre motivation..."></textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-outline-secondary me-2" (click)="cancel()">
+                        Annuler
+                    </button>
+
+                    <button type="submit" class="btn btn-success px-5" [disabled]="isSubmitting">
+                        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+                        {{ isSubmitting ? 'Envoi en cours...' : 'Soumettre la candidature' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

@@ -1,1 +1,87 @@
-<p>internships.component works!</p>
+<div class="container my-5">
+    <h2 class="text-center mb-4">Liste des Offres de Stage</h2>
+
+    <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-primary" (click)="addNewInternship()">
+            <i class="fa fa-plus"></i> Ajouter une offre
+        </button>
+        <button class="btn btn-outline-secondary" (click)="fetchInternships()" [disabled]="loading">
+            <i class="fa fa-refresh" [class.fa-spin]="loading"></i> Actualiser
+        </button>
+    </div>
+
+    <div *ngIf="errors" class="alert alert-danger">{{ errors }}</div>
+
+    <div *ngIf="loading && internships.length === 0" class="text-center my-5">
+        <div class="spinner-border text-primary"></div>
+        <p>Chargement...</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="internships.length > 0">
+        <table class="table table-striped table-hover shadow-sm align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Titre</th>
+                    <th>Ville</th>
+                    <th>Dates</th>
+                    <th>Statut</th>
+                    <th>Rémunéré</th>
+                    <th>Entreprise</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let internship of internships">
+                    <td class="fw-bold">{{ internship.title }}</td>
+                    <td>{{ internship.city }}, {{ internship.country }}</td>
+                    <td>
+                        <small>
+                        Du : {{ internship.startDate | date:'dd/MM/yyyy' }}<br/>
+                        Au : {{ internship.endDate | date:'dd/MM/yyyy' }}
+                        </small>
+                    </td>
+                    <td>
+                        <span class="badge" [ngClass]="internship.isActive ? 'bg-success' : 'bg-secondary'">
+                        {{ internship.isActive ? 'Actif' : 'Inactif' }}
+                        </span>
+                    </td>
+                    <td>{{ internship.isPaid ? '✅ Oui' : '❌ Non' }}</td>
+                    <td>
+                        <div *ngIf="internship.company; else noCompany">
+                            <strong>{{ internship.company.name }}</strong>
+                            <br />
+                            <small>
+                                <a [href]="formatWebsiteUrl(internship.company.website)"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-decoration-none">
+                                Visiter le site
+                                </a>
+                            </small>
+                        </div>
+                        <ng-template #noCompany>
+                            <span class="text-muted">Non spécifiée</span>
+                        </ng-template>
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-warning" (click)="editInternship(internship.id)">
+                                Modifier
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    (click)="removeInternship(internship.id)"
+                                    [disabled]="loading">
+                                Supprimer
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p *ngIf="internships.length === 0 && !loading" class="text-center mt-4">
+        Aucune offre disponible.
+    </p>
+</div>
+

@@ -1,20 +1,24 @@
-<div class="col-md-3">
-    <div *ngIf="connectedUser$ | async as user; else loading"
-         class="d-flex align-items-center justify-content-end gap-2">
-
-        <span class="d-none d-lg-inline"> Bonjour, <strong>{{ user.firstName }}</strong>
-        </span>
-
-        <div class="avatar" [title]="user.firstName + ' ' + user.lastName">
-            {{ getInitials(user) }}
+<div class="header-container">
+    <div class="header-content">
+        <div class="header-left">
+            <h5 class="m-0 text-muted d-none d-md-block">Tableau de bord</h5>
         </div>
-    </div>
 
-    <ng-template #loading>
-        <div class="d-flex justify-content-end">
-            <div class="avatar bg-light">
-                <i class="fa-solid fa-circle-notch fa-spin text-muted"></i>
+        <div *ngIf="connectedUser$ | async as user; else loading" class="user-profile">
+            <span class="d-none d-lg-inline user-greeting">
+                Bonjour, <strong>{{ user.firstName }}</strong>
+            </span>
+            <div class="avatar" [title]="user.firstName + ' ' + user.lastName">
+                {{ getInitials(user) }}
             </div>
         </div>
-    </ng-template>
+    </div>
 </div>
+
+<ng-template #loading>
+    <div class="user-profile">
+        <div class="avatar bg-light">
+            <i class="fa-solid fa-circle-notch fa-spin text-primary"></i>
+        </div>
+    </div>
+</ng-template>

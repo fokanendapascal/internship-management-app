@@ -1,0 +1,77 @@
+<div class="container my-4">
+    <h2 class="text-center mb-4">
+        {{ userId ? "Modifier l'utilisateur" : "Créer un nouvel utilisateur" }}
+    </h2>
+
+    <div *ngIf="loading" class="text-center my-5">Chargement...</div>
+
+    <form *ngIf="!loading" [formGroup]="userForm" (ngSubmit)="onSubmit()" class="border p-4 rounded shadow-sm bg-light">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Prénom</label>
+                <input type="text" class="form-control" formControlName="firstName"
+                    [class.is-invalid]="userForm.get('firstName')?.touched && userForm.get('firstName')?.invalid">
+                <div class="invalid-feedback">Prénom requis</div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Nom</label>
+                <input type="text" class="form-control" formControlName="lastName"
+                    [class.is-invalid]="userForm.get('lastName')?.touched && userForm.get('lastName')?.invalid">
+                <div class="invalid-feedback">Nom requis</div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" formControlName="email"
+                    [class.is-invalid]="userForm.get('email')?.touched && userForm.get('email')?.invalid">
+            <div class="invalid-feedback">Email valide requis</div>
+        </div>
+
+        <div class="mb-3" *ngIf="!userId">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" class="form-control" formControlName="password"
+                    [class.is-invalid]="userForm.get('password')?.touched && userForm.get('password')?.invalid">
+            <div class="invalid-feedback">Mot de passe requis</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-control" formControlName="telephone"
+                    [class.is-invalid]="userForm.get('telephone')?.touched && userForm.get('telephone')?.invalid">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label d-block">Rôles attribués</label>
+            <div class="d-flex flex-wrap gap-3">
+                <div *ngFor="let role of ROLE_LIST" class="form-check">
+                    <input type="checkbox"
+                        class="form-check-input"
+                        [id]="'role-' + role.id"
+                        [value]="role.id"
+                        [checked]="isRoleChecked(role.id)"
+                        (change)='onRoleChange($event)'>
+
+                    <label class="form-check-label" [for]="'role-' + role.id">
+                        {{ role.name }}
+                    </label>
+                </div>
+            </div>
+            <div *ngIf="userForm.get('roles')?.touched && userForm.get('roles')?.invalid" class="text-danger small mt-1">
+                Au moins un rôle requis
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button type="button" (click)="cancel()"
+                class="btn btn-outline-secondary">
+                Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="loading">
+                {{ userId ? "Enregistrer les modifications" : "Créer l'utilisateur" }}
+            </button>
+        </div>
+    </form>
+</div>
+

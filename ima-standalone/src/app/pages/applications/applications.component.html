@@ -1,1 +1,81 @@
-<p>applications.component works!</p>
+<div class="container my-5">
+    <h2 class="text-center mb-4">Liste des Candidatures</h2>
+
+    <div class="d-flex justify-content-between mb-3">
+        <button class="btn btn-primary" (click)="addNewApplication()">
+            <i class="fa fa-plus"></i> Ajouter une candidature
+        </button>
+        <button class="btn btn-outline-secondary" (click)="fetchApplications()" [disabled]="loading">
+            <i class="fa fa-refresh"></i> Actualiser
+        </button>
+    </div>
+
+    <div *ngIf="errors" class="alert alert-danger">{{ errors }}</div>
+
+    <div class="mb-3">
+        <input
+            type="text"
+            class="form-control"
+            placeholder="Rechercher par étudiant ou titre de stage..."
+            [(ngModel)]="searchTerm"
+        />
+    </div>
+
+    <div *ngIf="loading && applications.length === 0" class="text-center my-5">
+        <div class="spinner-border text-primary"></div>
+        <p>Chargement...</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading || applications.length > 0">
+        <table class="table table-striped table-hover shadow-sm align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date Candidature</th>
+                    <th>Status</th>
+                    <th>cvUrl</th>
+                    <th>coverLetter</th>
+                    <th>Student</th>
+                    <th>Internship</th>
+                    <th>Agreement</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of filteredApplications">
+                    <td class="fw-bold">{{ item.applicationDate | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="{
+                        'bg-success': item.status === 'ACCEPTED',
+                        'bg-danger': item.status === 'REJECTED',
+                        'bg-warning text-dark': item.status === 'PENDING'
+                        }">
+                        {{ item.status }}
+                        </span>
+                    </td>
+                    <td><a [href]="item.cvUrl" target="_blank" *ngIf="item.cvUrl">Voir CV</a></td>
+                    <td>{{ item.coverLetter | slice:0:20 }}...</td>
+
+                    <td>{{ item.student?.firstName }} {{ item.student?.lastName }}</td>
+                    <td>{{ item.internship?.title }} <small class="text-muted" *ngIf="item.internship?.city">({{ item.internship?.city }})</small></td>
+                    <td>{{ item.agreement ? 'ID: ' + item.agreement.id : 'N/A' }}</td>
+
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-warning" (click)="editApplication(item.id!)">
+                                Modifier
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" (click)="removeApplication(item.id!)" [disabled]="loading">
+                                Supprimer
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p *ngIf="filteredApplications.length === 0 && !loading" class="text-center py-4">
+            Aucune candidature disponible.
+        </p>
+    </div>
+</div>
+

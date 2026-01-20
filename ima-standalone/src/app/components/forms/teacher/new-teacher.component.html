@@ -1,0 +1,55 @@
+<div class="container my-4">
+    <h2 class="text-center mb-4">
+        {{ id ? "Modifier l'enseignant" : "Créer un nouvel enseignant" }}
+    </h2>
+
+    <div *ngIf="userId && !id" class="alert alert-info">
+        Profil enseignant pour l'utilisateur : <strong>{{ userId }}</strong>
+    </div>
+
+    <div *ngIf="loading && id" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p>Chargement...</p>
+    </div>
+
+    <form *ngIf="!(loading && id)"
+        [formGroup]="teacherForm" (ngSubmit)="onSubmit()"
+        class="border p-4 rounded shadow-sm bg-light"
+        >
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Département</label>
+                <input type="text" class="form-control" formControlName="department"
+                    [class.is-invalid]="teacherForm.get('department')?.touched && teacherForm.get('department')?.invalid">
+                <div class="invalid-feedback">Le département est obligatoire</div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Grade</label>
+                <input type="text" class="form-control" formControlName="grade"
+                    [class.is-invalid]="teacherForm.get('grade')?.touched && teacherForm.get('grade')?.invalid">
+                <div class="invalid-feedback">Le grade est obligatoire</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label class="form-label">Spécialité</label>
+                <input type="text" class="form-control" formControlName="specialty"
+                    [class.is-invalid]="teacherForm.get('specialty')?.touched && teacherForm.get('specialty')?.invalid">
+                <div class="invalid-feedback">La spécialité est obligatoire</div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button"
+                (click)="router.navigate(['/teachers'])" class="btn btn-outline-secondary">
+                Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="loading">
+                {{ loading ? "Enregistrement..." : (id ? "Enregistrer les modifications" : "Créer l'enseignant") }}
+            </button>
+        </div>
+    </form>
+</div>
+

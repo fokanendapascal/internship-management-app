@@ -1,0 +1,84 @@
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+        <h3 class="mb-0">Publier une offre de stage</h3>
+        </div>
+
+        <div class="card-body">
+            <form [formGroup]="internshipForm" (ngSubmit)="onSubmit()">
+
+                <div class="mb-3" formGroupName="company">
+                    <label class="form-label fw-bold text-primary">Entreprise partenaire</label>
+                    <select formControlName="id" class="form-select"
+                            [class.is-invalid]="internshipForm.get('company.id')?.touched && internshipForm.get('company.id')?.invalid">
+                        <option value="">-- Sélectionner une entreprise --</option>
+                        <option *ngFor="let company of companies" [value]="company.id">
+                        {{ company.name }} ({{ company.city }})
+                        </option>
+                    </select>
+                    <div class="invalid-feedback">Veuillez sélectionner une entreprise.</div>
+                    <div class="form-text">L'entreprise doit être déjà enregistrée dans le système.</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Titre du stage</label>
+                        <input type="text" class="form-control" formControlName="title"
+                            [class.is-invalid]="internshipForm.get('title')?.touched && internshipForm.get('title')?.invalid">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Ville</label>
+                        <input type="text" class="form-control" formControlName="city"
+                            [class.is-invalid]="internshipForm.get('city')?.touched && internshipForm.get('city')?.invalid">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Pays</label>
+                        <input type="text" class="form-control" formControlName="country"
+                            [class.is-invalid]="internshipForm.get('country')?.touched && internshipForm.get('country')?.invalid">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Date de début</label>
+                        <input type="date" class="form-control" formControlName="startDate"
+                            [class.is-invalid]="internshipForm.get('startDate')?.touched && internshipForm.get('startDate')?.invalid">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Date de fin</label>
+                        <input type="date" class="form-control" formControlName="endDate"
+                            [class.is-invalid]="internshipForm.get('endDate')?.touched && internshipForm.get('endDate')?.invalid">
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="4" formControlName="description"
+                                [class.is-invalid]="internshipForm.get('description')?.touched && internshipForm.get('description')?.invalid"></textarea>
+                    </div>
+
+                    <div class="col-md-12 mb-3 d-flex gap-4">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="isPaid" formControlName="isPaid">
+                            <label class="form-check-label" htmlFor="isPaid">Stage rémunéré</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="isActive" formControlName="isActive">
+                            <label class="form-check-label" htmlFor="isActive">Activer l'offre</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-secondary me-2" (click)="router.navigate(['/internships'])">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-success px-4" [disabled]="loading">
+                        {{ loading ? 'Enregistrement...' : 'Enregistrer le stage' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

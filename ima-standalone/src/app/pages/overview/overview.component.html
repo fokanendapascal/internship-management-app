@@ -1,1 +1,74 @@
-<p>overview.component works!</p>
+<div class="page-wrapper py-5 bg-light min-vh-100">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold mb-1">Vue d’ensemble</h2>
+                <p class="text-muted m-0">Activité sur les 7 derniers jours</p>
+            </div>
+
+            <div class="position-relative">
+                <div class="notification-icon" role="button" (click)="toggleNotifs($event)">
+                <lucide-icon name="bell" size="24"></lucide-icon>
+                <span *ngIf="alerts.length > 0" class="alert-badge"></span>
+                </div>
+
+                <div *ngIf="showNotifs" class="notification-dropdown shadow-lg p-3 bg-white rounded" (click)="$event.stopPropagation()">
+                <h6 class="fw-bold mb-3">Alertes</h6>
+                <div *ngIf="alerts.length > 0; else noAlerts">
+                    <div *ngFor="let a of alerts" class="d-flex gap-2 mb-2 p-2 rounded bg-light border-start border-danger border-4">
+                    <lucide-icon name="alert-triangle" size="16" class="text-danger"></lucide-icon>
+                    <small class="fw-bold">{{ a.msg }}</small>
+                    </div>
+                </div>
+                <ng-template #noAlerts>
+                    <div class="text-muted small text-center">Aucune alerte</div>
+                </ng-template>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="loading" class="d-flex justify-content-center vh-50 align-items-center">
+        <div class="spinner-border text-primary"></div>
+        </div>
+
+        <div class="row" *ngIf="!loading">
+            <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let card of cards">
+                <div class="card h-100 shadow-sm styled-card border-0" (click)="navigate(card.path)">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between mb-3">
+                        <div class="p-2 rounded bg-light" [ngClass]="card.color">
+                            <lucide-icon [name]="card.icon" size="28"></lucide-icon>
+                        </div>
+                        <div class="text-end" *ngIf="card.val !== undefined">
+                            <h2 class="fw-bold m-0">{{ card.val }}</h2>
+                            <span *ngIf="card.trend" class="badge ms-2"
+                                [ngClass]="card.trend.isUp ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'">
+                            {{ card.trend.isUp ? '↑' : '↓' }} {{ card.trend.percentage }}%
+                            </span>
+                        </div>
+                        </div>
+
+                        <h5 class="fw-bold">{{ card.title }}</h5>
+                        <p class="text-muted small">{{ card.desc }}</p>
+
+                        <div class="sparkline-wrapper" *ngIf="card.trend">
+                            <ngx-charts-line-chart
+                                [results]="card.trend.series"
+                                [scheme]="lineChartScheme"
+                                [animations]="false"
+                                [xAxis]="false"
+                                [yAxis]="false">
+                            </ngx-charts-line-chart>
+                        </div>
+
+                        <div class="mt-auto text-primary fw-bold small pt-3">
+                        Détails <lucide-icon name="arrow-right" size="14" class="ms-2"></lucide-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

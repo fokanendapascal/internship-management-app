@@ -1,1 +1,75 @@
-<p>teachers.component works!</p>
+<div class="container my-5">
+    <h2 class="text-center mb-4">Enseignants enregistrés</h2>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+        <button class="btn btn-outline-secondary" (click)="goBack()">
+            <i class="fa fa-arrow-left"></i> Retour
+        </button>
+
+        <div class="input-group" style="max-width: 400px;">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="fa fa-search text-muted"></i>
+            </span>
+            <input
+                type="text"
+                class="form-control border-start-0"
+                placeholder="Rechercher par département ou spécialité..."
+                [(ngModel)]="searchTerm"
+            />
+        </div>
+    </div>
+
+    <div *ngIf="loading && teachers.length === 0" class="text-center my-5">
+        Chargement...
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger text-center">
+        {{ error }}
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading || teachers.length > 0">
+        <table class="table table-striped table-hover shadow-sm align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Département</th>
+                    <th>Grade / Spécialité</th>
+                    <th>Conventions</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let teacher of filteredTeachers">
+                    <td>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                            {{ teacher.department }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong>{{ teacher.grade }}</strong><br/>
+                        <small class="text-muted">{{ teacher.specialty }}</small>
+                    </td>
+                    <td>
+                        {{ teacher.validatedAgreements?.length || 0 }} convention(s)
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-warning" (click)="editTeacher(teacher.id)">
+                                <i class="fa fa-edit"></i>Modifier
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" (click)="removeTeacher(teacher.id)">
+                                <i class="fa fa-trash"></i>Supprimer
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr *ngIf="filteredTeachers.length === 0 && !loading">
+                    <td colSpan="4" class="text-center py-4 text-muted">
+                        Aucun enseignant ne correspond à votre recherche "<strong>{{ searchTerm }}</strong>"
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

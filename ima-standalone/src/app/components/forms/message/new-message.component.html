@@ -1,0 +1,40 @@
+<p>new-message.component works!</p>
+<div class="card shadow mb-4">
+    <div class="card-header bg-success text-white">Nouveau Message</div>
+    <div class="card-body">
+        <form [formGroup]="messageForm" (ngSubmit)="handleSubmit()">
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Destinataire</label>
+                <select
+                    class="form-select"
+                    formControlName="recipientId"
+                    [class.is-invalid]="messageForm.get('recipientId')?.touched && messageForm.get('recipientId')?.invalid"
+                >
+                    <option value="" disabled>
+                        {{ usersLoading ? "Chargement des utilisateurs..." : "Sélectionnez un utilisateur..." }}
+                    </option>
+                    <option *ngFor="let user of users" [value]="user.id">
+                        {{ (user.firstName && user.lastName) ? (user.firstName + ' ' + user.lastName) : user.email }}
+                        {{ formatRoles(user.roles) }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Message</label>
+                <textarea
+                    class="form-control"
+                    rows="3"
+                    formControlName="content"
+                    [class.is-invalid]="messageForm.get('content')?.touched && messageForm.get('content')?.invalid"
+                ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100" [disabled]="loading || messageForm.invalid">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+                {{ loading ? 'Envoi...' : 'Envoyer' }}
+            </button>
+        </form>
+    </div>
+</div>
